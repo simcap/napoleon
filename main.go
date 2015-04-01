@@ -44,8 +44,12 @@ func search(w http.ResponseWriter, r *http.Request) {
 	query := r.URL.Query().Get("q")
 
 	url := fmt.Sprintf("http://%s:%d/codecivil/article/_search?q=Text:%s", elasticHost, elasticPort, query)
+
+	log.Printf("Searching for %s\n", url)
+
 	resp, err := http.Get(url)
 	if err != nil {
+		log.Printf("error searching for %s\n%s", url, err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
