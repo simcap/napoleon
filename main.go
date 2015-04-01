@@ -6,6 +6,7 @@ import (
 	"html/template"
 	"log"
 	"net/http"
+	"net/url"
 )
 
 var elasticHost = "elastic"
@@ -48,13 +49,17 @@ func search(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	url := fmt.Sprintf("http://%s:%d/codecivil/article/_search?size=100&q=Text:%s", elasticHost, elasticPort, query)
+	elasticurl, err := url.Parse(fmt.Sprintf("http://%s:%d/codecivil/article/_search", elasticHost, elasticPort))
+	parameters := url.Values{}
+	parameters.Add("size", "100")
+	parameters.Add("q", "Text:"+query)
+	elasticurl.RawQuery = parameters.Encode()
 
-	log.Printf("Searching for %s\n", url)
+	log.Printf("Searching for %s\n", elasticurl)
 
-	resp, err := http.Get(url)
+	resp, err := http.Get(elasticurl.String())
 	if err != nil {
-		log.Printf("error searching for %s\n%s", url, err)
+		log.Printf("error searching for %s\n%s", elasticurl, err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
