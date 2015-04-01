@@ -48,7 +48,7 @@ func search(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	url := fmt.Sprintf("http://%s:%d/codecivil/article/_search?size=50&q=Text:%s", elasticHost, elasticPort, query)
+	url := fmt.Sprintf("http://%s:%d/codecivil/article/_search?size=100&q=Text:%s", elasticHost, elasticPort, query)
 
 	log.Printf("Searching for %s\n", url)
 
