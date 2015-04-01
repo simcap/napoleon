@@ -39,11 +39,16 @@ type hits struct {
 }
 
 func search(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "text/html")
-
+	results := new(searchResults)
 	query := r.URL.Query().Get("q")
 
-	url := fmt.Sprintf("http://%s:%d/codecivil/article/_search?q=Text:%s", elasticHost, elasticPort, query)
+	if len(query) < 4 {
+		log.Printf("search term '%s' too short\n", query)
+		json.NewEncoder(w).Encode(results)
+		return
+	}
+
+	url := fmt.Sprintf("http://%s:%d/codecivil/article/_search?size=50&q=Text:%s", elasticHost, elasticPort, query)
 
 	log.Printf("Searching for %s\n", url)
 
@@ -54,8 +59,6 @@ func search(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	defer resp.Body.Close()
-
-	results := new(searchResults)
 
 	json.NewDecoder(resp.Body).Decode(results)
 	json.NewEncoder(w).Encode(results)
