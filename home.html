@@ -31,7 +31,7 @@
         innerText = nodes.item(i).innerHTML;
         innerText = innerText.replace(
           new RegExp("(" + word + ")", "ig"),
-          function(match) {return '<abbr>' + word +'</abbr>'}
+          function(match) {return '<abbr>' + match +'</abbr>'}
         );
         nodes.item(i).innerHTML = innerText;
       }
