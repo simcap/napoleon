@@ -39,7 +39,7 @@
   </script>
   <script type="text/javascript">
     $(document).ready(function() {
-      $("#send").on("click", function(event) {
+      $(".search").on("submit", function(event) {
         $.ajax({
             dataType: "json",
             url: "/search",
@@ -59,6 +59,7 @@
               }
             }
         });
+        event.preventDefault();
       });
     });
   </script>
@@ -68,7 +69,10 @@
   <section id="app">
     <div id="header">
       <h3>Cherchons le code civil</h3>
-      <input id="query" type="text" placeholder="Mot d'au moins 4 lettres. Ex: mayotte, interdire, dette, ..." autofocus="true"></input><button id="send">Search</button>
+      <form action="/search" method="post" class="search">
+       <input name="q" id="query" type="text" placeholder="Mot d'au moins 4 lettres. Ex: mayotte, interdire, dette, ..." autofocus="true"></input>
+       <button type="submit" id="send">Search</button>
+      </form>
     </div>
     <div id="answer"></div>
   </section>
