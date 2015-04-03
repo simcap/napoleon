@@ -47,11 +47,11 @@
             success: function(data) {
               hits = data.Hits.Hits
               if (hits == null || hits.length == 0) {
-                $("#answer").html("<p>Rien... ou mot trop court :(</p>");
+              $("#answer").html("<p>Aucun r&eacute;sultat pour <i>" + $("#query").val() + "</i></p>");
               } else {
                 $("#answer").html("")
                   hits.forEach(function(hit){
-                    $("#answer").append("<h4>&#8627;<a target='_blank' href='https://raw.githubusercontent.com/steeve/france.code-civil/master/" + hit._source.Path + "'>" + hit._source.Path.replace(".md", "") + "</a></h4><i>" + hit._source.Text + "</i>");
+                    $("#answer").append("<h4>&#8627;<a target='_blank' href='https://raw.githubusercontent.com/steeve/france.code-civil/master/" + hit._source.Section + "'>" + hit._source.Section.replace(".md", "") + "</a></h4><i>" + hit._source.Text + "</i>");
                   });
                   highlightWord($("#query").val());
                   $("#query").val("");

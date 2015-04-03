@@ -26,9 +26,9 @@ type searchResults struct {
 }
 
 type hits struct {
-	Source struct {
-		Path string
-		Text string
+	Article struct {
+		Section string
+		Text    string
 	} `json:"_source"`
 }
 
