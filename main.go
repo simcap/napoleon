@@ -2,28 +2,21 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
-	"html/template"
 	"log"
 	"net/http"
 	"net/url"
+	"text/template"
 )
 
-var elasticHost = "elastic"
-var elasticPort = 9200
+var homeTemplate = template.Must(template.ParseFiles("home.html"))
+var searchURL = "http://elastic:9200/codecivil/article/_search"
 
 func main() {
-	http.HandleFunc("/", home)
+	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		homeTemplate.Execute(w, nil)
+	})
 	http.HandleFunc("/search", search)
 	http.ListenAndServe(":8080", nil)
-}
-
-func home(w http.ResponseWriter, r *http.Request) {
-	t, err := template.ParseFiles("home.html")
-	if err != nil {
-		log.Printf("Error parsing template %v", err)
-	}
-	t.Execute(w, nil)
 }
 
 type searchResults struct {
@@ -49,15 +42,10 @@ func search(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	elasticurl, err := url.Parse(fmt.Sprintf("http://%s:%d/codecivil/article/_search", elasticHost, elasticPort))
-	parameters := url.Values{}
-	parameters.Add("size", "100")
-	parameters.Add("q", "Text:"+query)
-	elasticurl.RawQuery = parameters.Encode()
-
+	elasticurl := buildSearchUrl(query)
 	log.Printf("Searching for %s\n", elasticurl)
 
-	resp, err := http.Get(elasticurl.String())
+	resp, err := http.Get(elasticurl)
 	if err != nil {
 		log.Printf("error searching for %s\n%s", elasticurl, err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -67,4 +55,13 @@ func search(w http.ResponseWriter, r *http.Request) {
 
 	json.NewDecoder(resp.Body).Decode(results)
 	json.NewEncoder(w).Encode(results)
+}
+
+func buildSearchUrl(query string) string {
+	u, _ := url.Parse(searchURL)
+	parameters := url.Values{}
+	parameters.Add("size", "100")
+	parameters.Add("q", "Text:"+query)
+	u.RawQuery = parameters.Encode()
+	return u.String()
 }
